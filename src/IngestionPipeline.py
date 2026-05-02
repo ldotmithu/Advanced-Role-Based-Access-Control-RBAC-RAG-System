@@ -57,8 +57,8 @@ class IngestionRagPipeline:
             
 
 
-if __name__=="__main__":
-    ingest = IngestionRagPipeline()
-    ingest.run()            
+# if __name__=="__main__":
+#     ingest = IngestionRagPipeline()
+#     ingest.run()            
             
 
