@@ -118,5 +118,5 @@ uvicorn backend.main:app --reload
 │   └── marketing/
 ├── Faiss-Vectors/          # Generated vector indices
 ├── requirements.txt
-└── reme.md
+└── README.md
 ```
