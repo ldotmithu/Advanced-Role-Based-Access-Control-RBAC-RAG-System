@@ -4,5 +4,5 @@ setup(
     version="0.1.0",
     author="mithurshan",
     author_email="ldotmiturshan222@gamil.com",
-    find_packages = find_packages()
+    packages=find_packages(include=["src", "src.*", "utils", "utils.*"])
 )
