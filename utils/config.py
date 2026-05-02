@@ -8,7 +8,7 @@ class settings:
     CHUNK_OVERLAP = 450
     TOP_K = 6
     DATADIR = "data"
-    FAISS_INDEX = "FAISS-VECTORS"
+    FAISS_INDEX = "Faiss-Vectors"
     DEPAERTMENTS = os.listdir(path=DATADIR)
     
      

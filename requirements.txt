@@ -9,6 +9,7 @@ sentence-transformers
 markdown
 fastapi
 uvicorn
+unstructured
 -e .
 
 
