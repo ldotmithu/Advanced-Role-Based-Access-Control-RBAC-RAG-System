@@ -1,24 +1,35 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from src.GenerationPipeline import GenerationRAGPipeline
-import os 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+from typing import Optional
 
-class RAGClass(BaseModel):
-    role:str
-    question :str
+class ChatRequest(BaseModel):
+    role: str
+    question: str
+    
+    @field_validator('role')
+    @classmethod
+    def validate_role(cls, v):
+        if not v.strip():
+            raise ValueError('role cannot be empty')
+        return v
 
-app = FastAPI()
+class ChatResponse(BaseModel):
+    response: str
+    source: Optional[str] = None
 
+app = FastAPI(title="RBAC RAG System")
+_generation_pipeline = GenerationRAGPipeline()
 
 @app.get("/")
-def home():
-    return "RBAC RAG Aplication Running....."
+async def home():
+    return {"status": "RBAC RAG Application Running..."}
 
-@app.post("/chat")
-def chat(ragclass:RAGClass):
-    generation = GenerationRAGPipeline()
-    chain = generation.chatgeneration(ragclass.role)
-    response = chain.invoke(ragclass.question)
-    return response
-
-    
+@app.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    try:
+        chain = _generation_pipeline.chatgeneration(request.role)
+        response = chain.invoke(request.question)
+        return ChatResponse(response=response)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
