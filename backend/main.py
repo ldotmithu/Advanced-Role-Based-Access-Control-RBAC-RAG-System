@@ -59,9 +59,9 @@ app.add_middleware(
 # Initialize pipeline
 try:
     _generation_pipeline = GenerationRAGPipeline()
-    logger.info("✅ Generation pipeline initialized successfully")
+    logger.info(" Generation pipeline initialized successfully")
 except Exception as e:
-    logger.error(f"❌ Failed to initialize generation pipeline: {str(e)}")
+    logger.error(f" Failed to initialize generation pipeline: {str(e)}")
     _generation_pipeline = None
 
 @app.get("/")

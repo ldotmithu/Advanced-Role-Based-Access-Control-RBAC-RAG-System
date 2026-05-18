@@ -38,17 +38,17 @@ if st.button("Generate Answer"):
                     st.info(f"Source: {result['source']}")
 
             elif response.status_code == 429:
-                st.warning(f"⏳ Service Rate Limited\n\n{response.json().get('detail', 'Too many requests. Please wait a moment and try again.')}")
+                st.warning(f" Service Rate Limited\n\n{response.json().get('detail', 'Too many requests. Please wait a moment and try again.')}")
                 st.info("💡 **Tip:** The Groq API has rate limits on free tier accounts (~30 requests/minute).\n- Wait 30-60 seconds before retrying\n- Consider upgrading to a paid tier for higher limits")
             elif response.status_code == 504:
-                st.warning(f"⏱️ Request Timeout\n\n{response.json().get('detail', 'Request took too long. Please try again with a shorter question.')}")
+                st.warning(f"⏱ Request Timeout\n\n{response.json().get('detail', 'Request took too long. Please try again with a shorter question.')}")
             else:
                 error_detail = response.json().get('detail', response.text) if response.text else f"HTTP {response.status_code}"
                 st.error(f"API Error: {response.status_code}\n{error_detail}")
 
         except requests.exceptions.Timeout:
-            st.error("⏱️ Request timed out (60 seconds). The backend may be busy or the API is slow. Please try again.")
+            st.error(" Request timed out (60 seconds). The backend may be busy or the API is slow. Please try again.")
         except requests.exceptions.ConnectionError:
-            st.error(f"❌ Cannot connect to backend at {BACKEND_URL}\n\nMake sure the API server is running:\n```\nuvicorn backend.main:app --reload\n```")
+            st.error(f" Cannot connect to backend at {BACKEND_URL}\n\nMake sure the API server is running:\n```\nuvicorn backend.main:app --reload\n```")
         except Exception as e:
             st.error(f"Connection Error: {str(e)}")
