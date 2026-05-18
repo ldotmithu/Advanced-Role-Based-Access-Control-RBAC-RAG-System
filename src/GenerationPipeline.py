@@ -1,13 +1,18 @@
 import os 
+import logging
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough ,RunnableLambda
 from langchain_core.prompts import PromptTemplate
 from utils.config import settings
 from src.RetrieverPipeline import RetrieverRAGPipeline
-from dotenv import load_dotenv
 import warnings
 warnings.filterwarnings("ignore")
+from dotenv import load_dotenv
+
+# Configure logging instead of suppressing warnings
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 os.environ["GROQ_API_KEY"]  = os.getenv("GROQ_API_KEY")  # type:ignore
@@ -19,9 +24,13 @@ class GenerationRAGPipeline:
         self.retriever = RetrieverRAGPipeline()
         
 
-        self.llm = ChatGroq(model=self.llm_model,
-                            temperature=0.1,
-                            api_key=self.api_key) # type:ignore
+        self.llm = ChatGroq(
+            model=self.llm_model,
+            temperature=0.1,
+            api_key=self.api_key,
+            timeout=settings.REQUEST_TIMEOUT,
+            max_retries=settings.MAX_RETRIES
+        ) # type:ignore
     def _format_docs(self, docs):
         """Formats a list of documents into a readable string."""
         formatted_docs = []
@@ -59,7 +68,7 @@ class GenerationRAGPipeline:
             3. **ACCESS DENIED**: If the **Context** does not contain the answer, OR if the question is about a different department, you MUST output EXACTLY this sentence:
             "I do not have access to information regarding this topic for the {role} department."
             4. **NO HALLUCINATIONS**: Do not invent facts. If the answer is not in the context, refuse.
-            5.finally Give me the **metadata** information also to refer 
+            
 
             ### CONTEXT
             {context}
@@ -86,10 +95,10 @@ class GenerationRAGPipeline:
 
 #for testing
 
-if __name__=="__main__":
-    generation = GenerationRAGPipeline()
-    role = input("enter your role ..: ").strip()
-    chain = generation.chatgeneration(role)
-    question = input("enter your question ? ").strip()
-    response = chain.invoke(question)
-    print(response)
+# if __name__=="__main__":
+#     generation = GenerationRAGPipeline()
+#     role = input("enter your role ..: ").strip()
+#     chain = generation.chatgeneration(role)
+#     question = input("enter your question ? ").strip()
+#     response = chain.invoke(question)
+#     print(response)

@@ -1,19 +1,24 @@
 import os 
+import logging
 from utils.config import settings
 from langchain_community.document_loaders import DirectoryLoader,PyPDFLoader,CSVLoader,UnstructuredMarkdownLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from dotenv import load_dotenv
 import warnings
 warnings.filterwarnings("ignore")
+from dotenv import load_dotenv
+
+# Configure logging instead of suppressing warnings
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
 class IngestionRagPipeline:
     def __init__(self):
         self.datadir = settings.DATADIR
-        self.departments = settings.DEPAERTMENTS
+        self.departments = settings.DEPARTMENTS
         self.chunk_size = settings.CHUNK_SIZE
         self.chunk_overlap = settings.CHUNK_OVERLAP
         self.faiss_index = settings.FAISS_INDEX
@@ -26,10 +31,10 @@ class IngestionRagPipeline:
             dep_path = os.path.join(self.datadir,dep)
             
             if not os.path.exists(dep_path):
-                print(f"Skipping the {dep_path} Department")
+                logger.warning(f"Skipping the {dep_path} Department - path does not exist")
                 continue
             
-            print(f"processing {dep} Department data....")
+            logger.info(f"Processing {dep} Department data....")
             loaders = [
                 DirectoryLoader(dep_path,glob="**/*.pdf",loader_cls=PyPDFLoader), #type:ignore
                 DirectoryLoader(dep_path,glob="**/*.csv",loader_cls=CSVLoader),
@@ -47,13 +52,13 @@ class IngestionRagPipeline:
                                                       keep_separator=True)
             
             split_docs = splitter.split_documents(all_documents)
-            print(f"Chunking size {len(split_docs)}")        
+            logger.info(f"Chunked {len(split_docs)} documents for {dep} department")        
             
             db = FAISS.from_documents(documents=split_docs,
                                       embedding=self.embeddings)
             save_path = os.path.join(self.faiss_index,dep)
             db.save_local(folder_path=save_path)
-            # print(f"Strore Vectors in {save_path}")
+            logger.info(f"Stored FAISS vectors for {dep} department at {save_path}")
             
 
 

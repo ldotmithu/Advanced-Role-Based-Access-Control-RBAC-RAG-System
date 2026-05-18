@@ -11,6 +11,7 @@ fastapi
 uvicorn
 unstructured
 rank_bm25
+streamlit
 -e .
 
 
